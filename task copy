@@ -1,0 +1,65 @@
+from fastapi import APIRouter, Path, Query, Body
+
+
+task_router = APIRouter()
+
+from model import StatusType
+
+task_list=[
+
+]
+
+# @task_router.get("/page")
+# def page(page: int = Query(1, gt=0, title='Pagina a visualizar'), size: int = Query(10, le=100)):
+#     return {"page": page, "size": size}
+
+# @task_router.put("/")
+# def update(*, index: int = Path(ge=1, title="The ID of the todo to retrieve."), task: str, status: StatusType):
+
+@task_router.get("/")
+def get():
+    print(task_list)
+    return {"tasks": task_list}
+
+@task_router.post("/")
+def add(task: str = Body()):
+    task_list.append({
+         'task':task,
+         'status': StatusType.PENDING
+    })
+    print(task_list)
+    return task_list
+
+
+@task_router.put("/")
+# def update(index: int , task: str, status: StatusType):
+async def update(*, index: Annotated[int, Path(title="The ID of the item to get")], task: str, status: StatusType):
+# def update(*, index: int = Path(ge=1, title="The ID of the todo to retrieve."), task: str, status: StatusType):
+    task_list[index] = {
+         'task':task,
+         'status': status
+    }
+    print(task_list)
+    return task_list
+
+@task_router.delete("/")
+def delete(index: int):
+    # task_list[index] = task
+    del task_list[index] 
+    print(task_list)
+    return task_list
+
+# xxxxxxxx  async def add_todo(task: Task) -> dict:
+#     todo_list.append(task)
+#     return {"message": "Todo added successfully"}
+
+
+# todo_list = []
+# @todo_router.post("/todo")
+# async def add_todo(todo: Todo) -> dict:
+# # async def add_todo(todo: dict) -> dict:
+#     todo_list.append(todo)
+#     return {"message": "Todo added successfully"}
+# @todo_router.get("/todo")
+# async def retrieve_todos() -> dict:
+#     return {"todos": todo_list}
