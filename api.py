@@ -26,8 +26,8 @@ app.include_router(task_router)
 
 @app.get("/page/")
 def page(db: Session = Depends(get_database_session)):
-    get_task(db,1)
-    #create_user(db)
+    #get_task(db,1)
+    create_user(db)
     return {"page": 1}
 
 @app.get("/page2/")
