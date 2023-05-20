@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Path, Query, Body, HTTPException, status, File, UploadFile
-
+from fastapi import APIRouter, Path, Query, Body, HTTPException, status, File, UploadFile, Depends
+from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
-from models import Task, StatusType
-
-from sqlalchemy.orm import Session
-
 import shutil
+
+from models import Task, StatusType
+from crud import get_task
+
+from database import get_database_session
 
 task_list=[
 
@@ -22,7 +23,7 @@ def create_file(file: bytes = File()):
 
 
 @task_router.post("/uploadfile/")
-def create_upload_file(file: UploadFile):
+def create_upload_file(file: UploadFile, db: Session = Depends(get_database_session)):
     with open("img/destination.png", "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     return {"filename": file.filename}
@@ -30,7 +31,8 @@ def create_upload_file(file: UploadFile):
 
 
 @task_router.get("/", status_code=status.HTTP_200_OK)
-def get():
+def get(db: Session = Depends(get_database_session)):
+    get_task(db,1)
     #records = db.query(Task).all()
     return { "tasks": task_list }
 
