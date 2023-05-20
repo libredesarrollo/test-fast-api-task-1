@@ -7,7 +7,7 @@ import enum
 from sqlalchemy.schema import Column
 from sqlalchemy.types import String, Integer, Text, Enum
 
-from database import Base
+from __database import Base
 
 class StatusType(str, enum.Enum):
     READY = "ready"

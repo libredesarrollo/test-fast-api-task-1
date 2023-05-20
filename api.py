@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
 
-from database import get_database_session, Base, engine
+from __database import get_database_session, Base, engine
 
 Base.metadata.create_all(bind=engine)
 
