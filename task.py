@@ -4,11 +4,9 @@ from typing_extensions import Annotated
 
 import shutil
 
-from models import Task, StatusType
-from crud import get_task
-
-from __database import get_database_session
-
+from schemas import Task, StatusType
+from database.crud import get_task
+from database.database import get_database_session
 
 task_list=[
 

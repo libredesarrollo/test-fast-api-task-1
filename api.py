@@ -1,12 +1,13 @@
 from fastapi import FastAPI, Path, Query, Body, Depends
-from task import task_router
 from sqlalchemy.orm import Session
-
 from typing_extensions import Annotated
 
+from task import task_router
+from database.database import get_database_session, Base, engine
+from database.crud import get_task, create_user
+from database.models import Task
 
-from __database import get_database_session, Base, engine
-
+# task = Task()
 Base.metadata.create_all(bind=engine)
 
 # def get_database_session():
@@ -18,7 +19,6 @@ Base.metadata.create_all(bind=engine)
 #         print("********End app and DB")
 #         db.close()
 
-from crud import get_task, create_user
 
 app = FastAPI()
 app.include_router(task_router)
@@ -27,7 +27,7 @@ app.include_router(task_router)
 @app.get("/page/")
 def page(db: Session = Depends(get_database_session)):
     #get_task(db,1)
-    create_user(db)
+    #create_user(db)
     return {"page": 1}
 
 @app.get("/page2/")

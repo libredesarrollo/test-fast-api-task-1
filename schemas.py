@@ -1,32 +1,11 @@
 
 from pydantic import BaseModel,  ValidationError, validator, Field, EmailStr, HttpUrl
 from typing import List, Set, Optional
-import enum 
+from enum import Enum
 
-
-from sqlalchemy.schema import Column
-from sqlalchemy.types import String, Integer, Text, Enum
-
-from __database import Base
-
-class StatusType(str, enum.Enum):
-    READY = "ready"
+class StatusType(str,Enum):
+    DONE = "done"
     PENDING = "pending"
-
-# class StatusTypeModel(enum.Enum):
-#     ready = 1
-#     pending = 2
-
-class TaskModel(Base):
-    __tablename__ = "tasks"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(20), unique=True)
-    description = Column(Text())
-    # status = Column(Enum(StatusTypeModel))
-    status = Column(Enum(StatusType))
-    # email = Column(String(30), unique=True)
-    # website = Column(String(30))
-
 
 class MyBaseModel(BaseModel):
     id: int
@@ -66,7 +45,6 @@ class Task(MyBaseModel):
     description: Optional[str] = Field("No description", min_length=3)
     status: StatusType
     
-    
     # user: User
     category: Category
     # tags: List[str] = []
@@ -87,7 +65,6 @@ class Task(MyBaseModel):
             }
         }
 
-    
     @validator('name')
     def name_alphanumeric(cls, v):
         assert v.replace(" ", "").isalnum(), 'must be alphanumeric'
