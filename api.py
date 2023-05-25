@@ -4,7 +4,6 @@ from typing_extensions import Annotated
 
 from task import task_router
 from database.database import get_database_session, Base, engine
-from database.crud import get_task, create_user
 from database.models import Task
 
 # task = Task()

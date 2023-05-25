@@ -5,7 +5,7 @@ from typing_extensions import Annotated
 import shutil
 
 from schemas import Task, StatusType
-from database.crud import get_task
+from database.crud import getById, create, update
 from database.database import get_database_session
 
 task_list=[
@@ -18,11 +18,13 @@ task_list= []
 @task_router.post("/files/")
 # async def create_file(file: Annotated[bytes, File()]):
 def create_file(file: bytes = File()):
+    
     return {"file_size": len(file)}
 
 
 @task_router.post("/uploadfile/")
 def create_upload_file(file: UploadFile, db: Session = Depends(get_database_session)):
+    
     with open("img/destination.png", "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     return {"filename": file.filename}
@@ -31,12 +33,16 @@ def create_upload_file(file: UploadFile, db: Session = Depends(get_database_sess
 
 @task_router.get("/", status_code=status.HTTP_200_OK)
 def get(db: Session = Depends(get_database_session)):
-    get_task(db,1)
+    getById(db,1)
+    #create(db=db)
     #records = db.query(Task).all()
     return { "tasks": task_list }
 
 @task_router.post("/", status_code=status.HTTP_201_CREATED)  #status_code=201  status.HTTP_200_OK
-def add(task: Task):
+def add(task: Task, db: Session = Depends(get_database_session)):
+    print(task.name)
+    print("**")
+    update(getById(db,1), db)
     # task_list.append({
     #     "task" : task.name,
     #     "status" : task.status,
@@ -51,7 +57,7 @@ def add(task: Task):
     return { "tasks": status.HTTP_201_CREATED}
 
 @task_router.put("/", status_code=status.HTTP_200_OK) #status_code=200
-def update(index: int, task: Task):
+def update2(index: int, task: Task):
     print(len(task_list))
 
     #verificamos que no este fuera de rango el indice
