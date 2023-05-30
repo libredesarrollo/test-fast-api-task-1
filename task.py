@@ -5,7 +5,7 @@ from typing_extensions import Annotated
 import shutil
 
 from schemas import Task, StatusType
-from database.crud import getById, create, update
+from database.crud import getById, create, update, pagination
 from database.database import get_database_session
 
 task_list=[
@@ -33,7 +33,8 @@ def create_upload_file(file: UploadFile, db: Session = Depends(get_database_sess
 
 @task_router.get("/", status_code=status.HTTP_200_OK)
 def get(db: Session = Depends(get_database_session)):
-    getById(db,1)
+    # getById(db,1)
+    print(pagination(db,1,2))
     #create(db=db)
     #records = db.query(Task).all()
     return { "tasks": task_list }

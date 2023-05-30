@@ -3,9 +3,22 @@ from pydantic import BaseModel,  ValidationError, validator, Field, EmailStr, Ht
 from typing import List, Set, Optional
 from enum import Enum
 
-class StatusType(str,Enum):
-    DONE = "done"
+
+from sqlalchemy.schema import Column
+from sqlalchemy.types import String, Integer, Text
+
+from database import Base
+class TaskModel(Base):
+    __tablename__ = "tasks"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(20), unique=True)
+    email = Column(String(30), unique=True)
+    website = Column(String(30))
+
+class StatusType(str, Enum):
+    READY = "ready"
     PENDING = "pending"
+
 
 class MyBaseModel(BaseModel):
     id: int
@@ -40,18 +53,10 @@ class Category(MyBaseModel):
     #     }
     # validaciones de nombre e email TODO
 
-class TaskSimple(MyBaseModel):
-    name: str
-    description: Optional[str] = Field("No description", min_length=3)
-    status: StatusType    
-    class Config:
-        orm_mode = True
-        
 class Task(MyBaseModel):
     name: str
     description: Optional[str] = Field("No description", min_length=3)
     status: StatusType
-    
     # user: User
     category: Category
     # tags: List[str] = []
@@ -72,6 +77,7 @@ class Task(MyBaseModel):
             }
         }
 
+    
     @validator('name')
     def name_alphanumeric(cls, v):
         assert v.replace(" ", "").isalnum(), 'must be alphanumeric'

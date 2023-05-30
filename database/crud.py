@@ -1,6 +1,9 @@
 from sqlalchemy.orm import Session
 
 from database.models import Task, Category, StatusType
+from schemas import TaskSimple
+
+from database.pagination import PageParams, paginate
 
 def getById(db: Session, task_id: int):
     print(db.query(Task).filter(Task.id == task_id).first().category.name)
@@ -28,3 +31,8 @@ def update(task: Task,db: Session): #, user: Task
 def delete(task: Task,db: Session):    
     db.delete(task)
     db.commit()
+
+def pagination(db: Session, page:int, size:int):  
+    pageParams = PageParams()
+    return paginate(pageParams, db.query(Task).filter(Task.id > 1), TaskSimple)
+    # db.query.paginate(models.Task,page,size)
