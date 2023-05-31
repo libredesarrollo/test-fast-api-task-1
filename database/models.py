@@ -1,10 +1,18 @@
-from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import String, Integer, Text, Enum
+from sqlalchemy import Table
+from sqlalchemy.schema import  Column, ForeignKey
+from sqlalchemy.types import String, Integer, Text, Enum, DateTime
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from database.database import Base
 
 from schemas import StatusType
+
+
+task_tag = Table('task_tag',
+                 Base.metadata,
+                    Column('task_id', Integer, ForeignKey('tasks.id'), primary_key=True),
+                    Column('tag_id', Integer, ForeignKey('tags.id'), primary_key=True))
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -12,6 +20,9 @@ class Task(Base):
     name = Column(String(20), unique=True)
     description = Column(Text())
     status = Column(Enum(StatusType))
+
+    created = Column(DateTime(timezone=True), server_default=func.now())
+    updated = Column(DateTime(timezone=True), onupdate=func.now()) 
 
     category_id = Column(Integer, ForeignKey('categories.id'),
         nullable=False)
@@ -21,9 +32,16 @@ class Task(Base):
     
     category = relationship('Category',lazy="joined", back_populates='tasks') #, backref='products'
 
+    tags = relationship('Tag', secondary=task_tag, back_populates='tasks')
+
     # status = Column(Enum(StatusTypeModel))
     # email = Column(String(30), unique=True)
     # website = Column(String(30))
+
+class Tag(Base):
+    __tablename__ = 'tags'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
 
 class Category(Base):
     __tablename__ = 'categories'
