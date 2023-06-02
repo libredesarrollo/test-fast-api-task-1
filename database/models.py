@@ -22,7 +22,7 @@ class Task(Base):
     status = Column(Enum(StatusType))
 
     created = Column(DateTime(timezone=True), server_default=func.now())
-    updated = Column(DateTime(timezone=True), onupdate=func.now()) 
+    updated = Column(DateTime(timezone=True), onupdate=func.now())
 
     category_id = Column(Integer, ForeignKey('categories.id'),
         nullable=False)
