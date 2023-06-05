@@ -20,20 +20,20 @@ Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI()
-app.include_router(task_router)
+app.include_router(task_router, prefix="/tasks")
 
 
-@app.get("/page/")
-def page(db: Session = Depends(get_database_session)):
-    #get_task(db,1)
-    #create_user(db)
-    return {"page": 1}
+# @app.get("/page/")
+# def page(db: Session = Depends(get_database_session)):
+#     #get_task(db,1)
+#     #create_user(db)
+#     return {"page": 1}
 
-@app.get("/page2/")
-def page2(db: Session = Depends(get_database_session)):
-    get_task(db,1)
-    #create_user(db)
-    return {"page": 1}
+# @app.get("/page2/")
+# def page2(db: Session = Depends(get_database_session)):
+#     get_task(db,1)
+#     #create_user(db)
+#     return {"page": 1}
 
 # @app.get("/page/")
 # def page(page: int = Path(gt=0), size: int = Query(10, le=100)):
@@ -64,3 +64,12 @@ def page2(db: Session = Depends(get_database_session)):
   
 # ):
 #     return {"product": product}
+
+from fastapi import Request
+from fastapi.templating import Jinja2Templates
+
+templates = Jinja2Templates(directory="templates/")
+
+@app.get("/")
+async def index(request: Request):
+    return templates.TemplateResponse("task/index.html",{ "request": request })
