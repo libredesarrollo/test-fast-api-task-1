@@ -32,7 +32,7 @@ class Task(Base):
     
     category = relationship('Category',lazy="joined", back_populates='tasks') #, backref='products'
 
-    tags = relationship('Tag', secondary=task_tag, back_populates='tasks')
+    tags = relationship('Tag', secondary=task_tag)  #, back_populates='tasks'
 
     # status = Column(Enum(StatusTypeModel))
     # email = Column(String(30), unique=True)
@@ -42,6 +42,7 @@ class Tag(Base):
     __tablename__ = 'tags'
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
+    # tasks = relationship('Task', back_populates='category',lazy="joined")
 
 class Category(Base):
     __tablename__ = 'categories'

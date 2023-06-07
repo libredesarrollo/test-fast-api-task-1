@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import load_only
 
 from database.models import Task, Category, StatusType
 from schemas import TaskSimple
@@ -6,9 +7,15 @@ from schemas import TaskSimple
 from database.pagination import PageParams, paginate
 
 def getById(db: Session, task_id: int):
-    print(db.query(Task).filter(Task.id == task_id).first().category.name)
-    print(db.query(Category).filter(Category.id == 1).first().tasks[1].name)
+    # print(db.query(Task).filter(Task.id == task_id).first().category.name)
+    # print(db.query(Category).filter(Category.id == 1).first().tasks[1].name) 
+    return db.query(Task).options(load_only(Task.name, Task.status)).get(task_id)
     return db.query(Task).filter(Task.id == task_id).first()
+    
+
+def getAll(db: Session):
+    tasks = db.query(Task).all()
+    return tasks 
 
 
 def create(db: Session): #, user: Task

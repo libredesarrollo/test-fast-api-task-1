@@ -46,33 +46,54 @@ class TaskSimple(MyBaseModel):
     status: StatusType    
     class Config:
         orm_mode = True
-        
-class Task(MyBaseModel):
+
+
+
+class TaskBase(BaseModel):
     name: str
-    description: Optional[str] = Field("No description", min_length=3)
+    description: Optional[str] = Field("No description",min_length=5)
     status: StatusType
     
-    # user: User
-    category: Category
-    # tags: List[str] = []
-    tags: Set[str] = set()
+    category_id: int = Field(gt=0)
     class Config:
-        orm_mode = True
-        schema_extra = {
-            "example": {
-                "id":55,
-                "name": "Foo",
-                "description": "A very nice Item",
-                "status": StatusType.PENDING,
-                "tags": ["tag 1"],
-                "category": {
-                    "id":66,
-                    "name": "Foo"
-                }
-            }
-        }
+       orm_mode = True
 
-    @validator('name')
-    def name_alphanumeric(cls, v):
-        assert v.replace(" ", "").isalnum(), 'must be alphanumeric'
-        return v
+    
+class TaskRead(TaskBase):
+    id:int
+
+class TaskWrite(TaskBase):
+    id: Optional[int] = Field(default=None)
+    user_id: Optional[int] = Field()
+
+
+        
+# class Task(MyBaseModel):
+#     name: str
+#     description: Optional[str] = Field("No description", min_length=3)
+#     status: StatusType
+    
+#     # user: User
+#     category: Category
+#     # tags: List[str] = []
+#     tags: Set[str] = set()
+#     class Config:
+#         orm_mode = True
+#         schema_extra = {
+#             "example": {
+#                 "id":55,
+#                 "name": "Foo",
+#                 "description": "A very nice Item",
+#                 "status": StatusType.PENDING,
+#                 "tags": ["tag 1"],
+#                 "category": {
+#                     "id":66,
+#                     "name": "Foo"
+#                 }
+#             }
+#         }
+
+#     @validator('name')
+#     def name_alphanumeric(cls, v):
+#         assert v.replace(" ", "").isalnum(), 'must be alphanumeric'
+#         return v
