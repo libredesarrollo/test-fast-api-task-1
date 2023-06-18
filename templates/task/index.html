@@ -1,6 +1,7 @@
 
 
 
-{% for n in [10,2,43,-5,0]|sort(reverse=true) %}
+{% for n in [10,2,43,-5,0]|slice(3) %}
   {{ n }}
 {% endfor %}
+
