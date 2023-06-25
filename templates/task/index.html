@@ -1,7 +1,28 @@
+{% set var1 = '<title>FastAPI</title>' %}
+{% set var2 = var1 %}
 
 
+{% raw %}
+var1
+{{ var1 }}
+<title>FastAPI</title>
+{% endraw %}
 
-{% for n in [10,2,43,-5,0]|slice(3) %}
-  {{ n }}
-{% endfor %}
 
+<table>
+     <tr>
+          <td>Name</td>
+          <td>Category</td>
+          <td>Status</td>
+     </tr>
+     {% for t in tasks %}
+          <tr>
+               <td>{{t.name}}</td>
+               <td>{{t.category.name}}</td>
+               <td>{{t.status}}</td>
+              
+          </tr>
+     {% endfor %}
+</table>
+
+{% include 'task/_create.html' %}

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Path, Query, Body, HTTPException, status, File, UploadFile, Depends
+from fastapi import APIRouter, Path, Query, Body, HTTPException, status, File, UploadFile, Depends, Request 
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
@@ -44,7 +44,8 @@ def get(db: Session = Depends(get_database_session)):
 #     return { "tasks": task_list }
 
 @task_router.post("/", status_code=status.HTTP_201_CREATED)  #status_code=201  status.HTTP_200_OK
-def add(task: TaskWrite, db: Session = Depends(get_database_session)):
+# def add(request: Request, task:TaskWrite = Depends(TaskWrite.as_form), db: Session = Depends(get_database_session)):
+def add(task:TaskWrite, db: Session = Depends(get_database_session)):
     print(task.name)
     print("**")
     update(getById(db,1), db)
@@ -80,7 +81,6 @@ def update2(index: int, task: TaskWrite):
 
 @task_router.get("/{id}", status_code=status.HTTP_200_OK) #status_code=200
 def get(id: int, db: Session = Depends(get_database_session)):
-
     return { "task": getById(db, id) }
 
 @task_router.delete("/", status_code=status.HTTP_200_OK) #status_code=200

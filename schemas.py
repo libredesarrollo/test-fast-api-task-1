@@ -3,6 +3,8 @@ from pydantic import BaseModel,  ValidationError, validator, Field, EmailStr, Ht
 from typing import List, Set, Optional
 from enum import Enum
 
+from fastapi import Form
+
 class StatusType(str,Enum):
     DONE = "done"
     PENDING = "pending"
@@ -58,6 +60,16 @@ class TaskBase(BaseModel):
     class Config:
        orm_mode = True
 
+    @classmethod
+    def as_form(
+            cls,
+            name: str = Form(...),
+            description: str = Form(...),
+            status: str = Form(...),
+            category_id: str = Form(...),
+    ):
+        return cls(name=name, description=description, status=status,category_id=category_id)
+
     
 class TaskRead(TaskBase):
     id:int
@@ -97,3 +109,14 @@ class TaskWrite(TaskBase):
 #     def name_alphanumeric(cls, v):
 #         assert v.replace(" ", "").isalnum(), 'must be alphanumeric'
 #         return v
+
+class UserBase(BaseModel):
+    email: EmailStr
+    class Config:
+        orm_mode = True
+class UserCreate(UserBase):
+    password: str
+class User(UserBase):
+    id: int
+class UserDB(User):
+    hashed_password: str 

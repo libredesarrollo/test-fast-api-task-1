@@ -1,0 +1,28 @@
+<form action="tasks/" method="post">
+    <input type="text" name="name">
+    <input type="text" name="status">
+    <textarea name="description"></textarea>
+    <textarea name="category_id"></textarea>
+
+    <button type="submit">Send</button>
+</form>
+
+<button id="createTask">Create task</button>
+
+<script>
+    document.getElementById("createTask").addEventListener('click', function () {
+         let datos = {
+              'name': 'Task 1',
+              'category_id': 1,
+              'description': 'Description',
+              'status': 'done',
+         }
+
+         fetch('tasks/', {
+              method: 'POST',
+              body: JSON.stringify(datos),
+              headers: { "Content-type": "application/json; charset=UTF-8" }
+         }).then(response => response.json())
+              .then(data => console.log(data));
+    })
+</script>

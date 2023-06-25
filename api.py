@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Path, Query, Body, Depends
+from fastapi import FastAPI, Path, Query, Body, Depends, HTTPException, status, Header
+from fastapi.security import APIKeyHeader
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
@@ -6,6 +7,9 @@ from task import task_router
 from database.database import get_database_session, Base, engine
 from database.crud import getAll
 from database.models import Task
+
+
+
 
 # task = Task()
 Base.metadata.create_all(bind=engine)
@@ -23,8 +27,24 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 app.include_router(task_router, prefix="/tasks")
 
-from fastapi.security import APIKeyHeader
-from fastapi import Depends, FastAPI, HTTPException, status
+
+
+
+def validate_token(token: str = Header()):
+   if token != "TOKEN":
+      raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,)
+
+
+@app.get("/get-task", dependencies=[Depends(validate_token)])
+async def protected_route(index: int):
+    
+    return {"hello": "FASTAPI"}
+
+
+
+
+
+
 
 API_KEY_TOKEN = "SECRET_PASSWORD"
 
@@ -48,12 +68,12 @@ async def authenticate(token: str = Depends(APIKeyHeader(name="Token"))):
 # async def protected_route():
 #     return {"hello": "world"}
 
-@app.get("/page/")
-def page(db: Session = Depends(get_database_session), dependencies=Depends(authenticate)):
-    print(getAll(db))
-    #create_user(db)
-    print(dependencies)
-    return {"page": 1}
+# @app.get("/page/")
+# def page(db: Session = Depends(get_database_session), dependencies=Depends(authenticate)):
+#     print(getAll(db))
+#     #create_user(db)
+#     print(dependencies)
+#     return {"page": 1}
 
 # @app.get("/page2/")
 # def page2(db: Session = Depends(get_database_session)):
@@ -61,9 +81,9 @@ def page(db: Session = Depends(get_database_session), dependencies=Depends(authe
 #     #create_user(db)
 #     return {"page": 1}
 
-# @app.get("/page/")
-# def page(page: int = Path(gt=0), size: int = Query(10, le=100)):
-#     return {"page": page, "size": size}
+@app.get("/pagetest/{page}")
+def page(page: int = Path(...,gt=0), size: int = Query(12, le=100)):
+    return {"page": page, "size": size}
 
 
 # @app.post("/products")
@@ -97,5 +117,5 @@ from fastapi.templating import Jinja2Templates
 templates = Jinja2Templates(directory="templates/")
 
 @app.get("/")
-async def index(request: Request):
-    return templates.TemplateResponse("task/index.html",{ "request": request })
+async def index(request: Request, db: Session = Depends(get_database_session)):
+    return templates.TemplateResponse("task/index.html", { "request": request, 'tasks': getAll(db) })
