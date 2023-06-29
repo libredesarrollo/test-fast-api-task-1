@@ -2,8 +2,12 @@
 from pydantic import BaseModel,  ValidationError, validator, Field, EmailStr, HttpUrl
 from typing import List, Set, Optional
 from enum import Enum
+from datetime import datetime
 
 from fastapi import Form
+
+def get_expiration_date(duration_seconds: int = 86400) -> datetime:
+    return timezone.now() + timedelta(seconds=duration_seconds)
 
 class StatusType(str,Enum):
     DONE = "done"
@@ -23,12 +27,7 @@ class MyBaseModel(BaseModel):
             raise ValueError('must be less less than a thousand')
         return v
     
-class User(MyBaseModel):
-    id: int = Field(ge=5, le=120)
-    name: str =  Field(..., min_length=3)
-    surname: str
-    email: EmailStr
-    website: HttpUrl
+
     
 class Category(MyBaseModel):
     id: int
@@ -63,10 +62,10 @@ class TaskBase(BaseModel):
     @classmethod
     def as_form(
             cls,
-            name: str = Form(...),
-            description: str = Form(...),
-            status: str = Form(...),
-            category_id: str = Form(...),
+            name: str = Form(),
+            description: str = Form(),
+            status: str = Form(),
+            category_id: str = Form(),
     ):
         return cls(name=name, description=description, status=status,category_id=category_id)
 
@@ -77,7 +76,16 @@ class TaskRead(TaskBase):
 class TaskWrite(TaskBase):
     id: Optional[int] = Field(default=None)
     user_id: Optional[int] = Field()
-
+    @classmethod
+    def as_form(
+            cls,
+            name: str = Form(),
+            description: str = Form(),
+            status: str = Form(),
+            user_id: str = Form(),
+            category_id: str = Form(),
+    ):
+        return cls(name=name, description=description, status=status,category_id=category_id, user_id=user_id, )
 
         
 # class Task(MyBaseModel):
@@ -110,13 +118,30 @@ class TaskWrite(TaskBase):
 #         assert v.replace(" ", "").isalnum(), 'must be alphanumeric'
 #         return v
 
-class UserBase(BaseModel):
+class User(MyBaseModel):
+    id: int = Field(ge=5, le=120)
+    name: str =  Field(..., min_length=3)
+    surname: str
     email: EmailStr
+    website: HttpUrl
     class Config:
         orm_mode = True
-class UserCreate(UserBase):
+
+# class UserBase(BaseModel):
+#     email: EmailStr
+#     class Config:
+#         orm_mode = True
+# class User(UserBase):
+#     id: int
+class UserCreate(User):
     password: str
-class User(UserBase):
-    id: int
+
 class UserDB(User):
     hashed_password: str 
+
+class AccessToken(MyBaseModel):
+    user_id: int
+    access_token: str
+    expiration_date: datetime
+    class Config:
+        orm_mode = True

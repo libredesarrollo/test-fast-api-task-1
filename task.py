@@ -44,11 +44,15 @@ def get(db: Session = Depends(get_database_session)):
 #     return { "tasks": task_list }
 
 @task_router.post("/", status_code=status.HTTP_201_CREATED)  #status_code=201  status.HTTP_200_OK
+def add(request: Request, task:TaskWrite = Depends(TaskWrite.as_form), db: Session = Depends(get_database_session)):
+# async def find_item(name: str = Form(...), another: str = Form(...)):
 # def add(request: Request, task:TaskWrite = Depends(TaskWrite.as_form), db: Session = Depends(get_database_session)):
-def add(task:TaskWrite, db: Session = Depends(get_database_session)):
-    print(task.name)
-    print("**")
-    update(getById(db,1), db)
+# def add(task:TaskWrite, db: Session = Depends(get_database_session)):
+    # print(task.name)
+    # print("**")
+    # update(getById(db,1), db)
+    print(task.as_form)
+    # create(task, db)
     # task_list.append({
     #     "task" : task.name,
     #     "status" : task.status,

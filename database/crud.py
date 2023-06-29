@@ -18,13 +18,13 @@ def getAll(db: Session):
     return tasks 
 
 
-def create(db: Session): #, user: Task
-    # fake_hashed_password = user.password + "notreallyhashed"
-    db_user = Task(name="test 2", status=StatusType.PENDING,description='aaaaaaaa', category_id=1, user_id=1)
-    db.add(db_user)
+def create(task: Task, db: Session):
+    taskdb = Task(name=task.name, description=task.description, status=task.status, category_id = task.category_id, user_id = task.user_id)
+    db.add(taskdb)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    db.refresh(taskdb)
+    return taskdb
+
 
 def update(task: Task,db: Session): #, user: Task
     # fake_hashed_password = user.password + "notreallyhashed"

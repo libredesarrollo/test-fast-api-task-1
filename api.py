@@ -4,9 +4,10 @@ from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
 from task import task_router
+from user import user_router
 from database.database import get_database_session, Base, engine
 from database.crud import getAll
-from database.models import Task
+from database.models import User, AccessToken
 
 
 
@@ -26,19 +27,17 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 app.include_router(task_router, prefix="/tasks")
+app.include_router(user_router)
 
 
 
 
-def validate_token(token: str = Header()):
-   if token != "TOKEN":
-      raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,)
+# def validate_token(token: str = Header()):
+#    if token != "TOKEN":
+#       raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,)
 
 
-@app.get("/get-task", dependencies=[Depends(validate_token)])
-async def protected_route(index: int):
-    
-    return {"hello": "FASTAPI"}
+
 
 
 
@@ -49,17 +48,26 @@ async def protected_route(index: int):
 API_KEY_TOKEN = "SECRET_PASSWORD"
 
 api_key_header = APIKeyHeader(name="Token")
-@app.get("/protected-route")
-async def protected_route(token: str = Depends(api_key_header)):
-    if token != API_KEY_TOKEN:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    return {"hello": "fAPI_TOKENastapi"}
+
+def protected_route(db: Session = Depends(get_database_session), token: str = Depends(api_key_header)):
+    user = db.query(User).join(AccessToken).filter(AccessToken.access_token == token).first()
+
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+@app.get("/get-task", dependencies=[Depends(protected_route)])
+def protected_route(index: int):
+   return {"hello": "FASTAPI"}
+
+    # if token != API_KEY_TOKEN:
+    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    # return {"hello": "fAPI_TOKENastapi"}
 
 
-async def authenticate(token: str = Depends(APIKeyHeader(name="Token"))):
-    if token != API_KEY_TOKEN:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    return token
+# async def authenticate(token: str = Depends(APIKeyHeader(name="Token"))):
+#     if token != API_KEY_TOKEN:
+#         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+#     return token
     
 
 

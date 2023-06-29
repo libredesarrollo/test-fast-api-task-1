@@ -57,4 +57,12 @@ class User(Base):
     surname = Column(String(20))
     email = Column(String(50))
     website = Column(String(50))
-
+    hashed_password = Column(String(255))
+    
+class AccessToken(Base):
+    __tablename__ = 'access_tokens'
+    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    access_token = Column(String(255))
+    expiration_date = Column(DateTime(timezone=True))
+    class Config:
+        orm_mode = True
