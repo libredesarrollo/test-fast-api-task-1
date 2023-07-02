@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, Query, Body, Depends, HTTPException, status, Header
+from fastapi import FastAPI, Path, Query, Body, Depends, HTTPException, status, Header, Request
 from fastapi.security import APIKeyHeader
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
@@ -38,9 +38,33 @@ app.include_router(user_router)
 
 
 
+import time
 
+from fastapi.responses import JSONResponse
 
+# @app.middleware("http")
+# async def add_middleware_here(request: Request, call_next):
+#     token = request.headers["Authorization"]
+#     try:
+#         verification_of_token = verify_token(token)
+#         if verification_of_token:
+#             response = await call_next(request)
+#             return response
+#         else:
+#             return JSONResponse(status_code=403) # or 401
+#     except InvalidSignatureError as er:
+#         return JSONResponse(status_code=401)
 
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    print("process_time")
+    print(process_time)
+    response.headers["X-Process-Time"] = str(process_time)
+    return JSONResponse(status_code=401, content='No Authenticate')
+    return response
 
 
 
